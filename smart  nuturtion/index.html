@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Nutrition System</title>
+
+    <style>
+        
+/* Mobile-friendly design */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    line-height: 1.6;
+}
+
+.container {
+    width: 92%;
+    max-width: 1000px;
+    margin: 25px auto;
+    padding: 10px;
+}
+
+.card {
+    padding: 24px;
+    overflow-wrap: anywhere;
+}
+
+input,
+select {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    border: 1px solid #cbd5cb;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+button {
+    min-height: 44px;
+    max-width: 100%;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 600px) {
+    header {
+        padding: 18px 12px;
+    }
+
+    header h1 {
+        font-size: 25px;
+    }
+
+    .container {
+        width: 100%;
+        padding: 10px;
+        margin: 12px auto;
+    }
+
+    .card {
+        padding: 16px;
+        margin: 14px 0;
+    }
+
+    button {
+        margin: 5px 2px;
+        padding: 12px 14px;
+    }
+}
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f8f0;
+            color: #243b2a;
+            text-align: center;
+        }
+
+        header {
+            background-color: #176b45;
+            color: white;
+            padding: 25px;
+        }
+
+        header h1 {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px #00000012;
+        }
+
+        button {
+            background-color: #218c58;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            margin: 8px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #145c39;
+        }
+
+        footer {
+            background-color: #176b45;
+            color: white;
+            padding: 15px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🥗 Smart Nutrition System</h1>
+        <p>Eat Healthy • Live Healthy</p>
+        <p>ஆரோக்கியமான உணவு, ஆரோக்கியமான வாழ்க்கை!</p>
+    </header>
+
+    <div class="container">
+
+        <div class="card">
+            <h2>🍎 Welcome to Smart Nutrition</h2>
+            <p>உங்கள் தினசரி உணவைத் திட்டமிட்டு ஆரோக்கியமாக வாழுங்கள்.</p>
+        </div>
+
+        
+<div class="card">
+    <h2>🍽️ Choose Your Food</h2>
+    <p>உங்களுக்கு விருப்பமான உணவு வகையைத் தேர்ந்தெடுக்கவும்.</p>
+
+    <button onclick="showFood('veg')">🥦 Vegetarian</button>
+
+    <button onclick="showFood('nonveg')">🍗 Non-Vegetarian</button>
+
+    <div id="foodResult"></div>
+</div>
+
+<script>
+function showFood(type) {
+    const result = document.getElementById("foodResult");
+
+    if (type === "veg") {
+        result.innerHTML = `
+            <h3>🥦 சைவ உணவுகள்</h3>
+            <p>இட்லி — சுமார் 60 calories / இட்லி</p>
+            <p>தோசை — சுமார் 150 calories / தோசை</p>
+            <p>சாம்பார் சாதம் — சுமார் 250 calories / கிண்ணம்</p>
+            <p>காய்கறி பொரியல் — சுமார் 100 calories / சிறிய கிண்ணம்</p>
+        `;
+    } else {
+        result.innerHTML = `
+            <h3>🍗 அசைவ உணவுகள்</h3>
+            <p>வேகவைத்த முட்டை — சுமார் 75 calories / முட்டை</p>
+            <p>சிக்கன் — சுமார் 200 calories / 100 கிராம்</p>
+            <p>மீன் — சுமார் 150 calories / 100 கிராம்</p>
+            <p>சிக்கன் பிரியாணி — சுமார் 400–600 calories / தட்டு</p>
+        `;
+    }
+}
+</script>
+
+
+        <div class="card">
+            <h2>💚 Healthy Living Tips</h2>
+            <p>🥗 சமச்சீரான உணவை உட்கொள்ளுங்கள்.</p>
+            <p>💧 போதுமான தண்ணீர் குடியுங்கள்.</p>
+            <p>🏃 தினமும் உடற்பயிற்சி செய்யுங்கள்.</p>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>© 2026 Smart Nutrition System</p>
+    </footer>
+
+<div class="card">
+    <h2>👤 Your Nutrition Profile</h2>
+
+    <label>வயது (Years):</label><br>
+    <input type="number" id="age" placeholder="உங்கள் வயது"><br><br>
+
+    <label>எடை (Weight in kg):</label><br>
+    <input type="number" id="weight" placeholder="உங்கள் எடை"><br><br>
+
+    <label>உயரம் (Height in cm):</label><br>
+    <input type="number" id="height" placeholder="உங்கள் உயரம்"><br><br>
+
+    <label>உடல் இயக்கம்:</label><br>
+    <select id="activity">
+        <option value="1.2">குறைந்த உடல் இயக்கம்</option>
+        <option value="1.375">லேசான உடற்பயிற்சி</option>
+        <option value="1.55">மிதமான உடற்பயிற்சி</option>
+        <option value="1.725">அதிக உடற்பயிற்சி</option>
+    </select><br><br>
+
+    <button onclick="calculateCalories()">
+        Calculate Calories
+    </button>
+
+    <div id="calorieResult"></div>
+</div>
+
+<script>
+function calculateCalories() {
+    const age = Number(document.getElementById("age").value);
+    const weight = Number(document.getElementById("weight").value);
+    const height = Number(document.getElementById("height").value);
+    const activity = Number(document.getElementById("activity").value);
+    const result = document.getElementById("calorieResult");
+
+    if (age < 18 || age > 120 ||
+        weight <= 0 || height <= 0 ||
+        !Number.isFinite(age) ||
+        !Number.isFinite(weight) ||
+        !Number.isFinite(height)) {
+        result.innerHTML =
+            "<p>தயவுசெய்து சரியான விவரங்களை உள்ளிடுங்கள். இந்தக் கணிப்பான் 18 வயது மற்றும் அதற்கு மேற்பட்டவர்களுக்கானது.</p>";
+        return;
+    }
+
+    const bmi = weight / ((height / 100) ** 2);
+
+    // Approximate adult energy estimate.
+    // This formula uses a reference coefficient, not a
+    // personalized clinical calorie prescription.
+    const calories = Math.round(
+        (10 * weight + 6.25 * height - 5 * age + 5)
+        * activity
+    );
+
+    result.innerHTML = `
+        <h3>📊 Your Results</h3>
+        <p>தோராயமான BMI: ${bmi.toFixed(1)}</p>
+        <p>தோராயமான தினசரி கலோரி மதிப்பீடு: ${calories} kcal</p>
+        <p>இது ஒரு பொதுவான மதிப்பீடு மட்டுமே; தனிப்பட்ட உணவு ஆலோசனை அல்ல.</p>
+    `;
+}
+</script>
+
+<div class="card">
+    <h2>🍱 Daily Meal Planner</h2>
+    <p>உங்கள் உணவுத் திட்டத்தைத் தேர்ந்தெடுக்கவும்.</p>
+
+    <label for="dietType">உணவு வகை:</label><br><br>
+
+    <select id="dietType">
+        <option value="veg">சைவ உணவு</option>
+        <option value="nonveg">அசைவ உணவு</option>
+    </select>
+
+    <br><br>
+
+    <button onclick="showMealPlan()">Show My Meal Plan</button>
+
+    <div id="mealResult"></div>
+</div>
+
+<script>
+function showMealPlan() {
+    const type = document.getElementById("dietType").value;
+    const result = document.getElementById("mealResult");
+
+    if (type === "veg") {
+        result.innerHTML = `
+            <h3>🌅 காலை உணவு</h3>
+            <p>2 இட்லி + சாம்பார்</p>
+
+            <h3>☀️ மதிய உணவு</h3>
+            <p>சாதம் + சாம்பார் + காய்கறி பொரியல் + தயிர்</p>
+
+            <h3>🌙 இரவு உணவு</h3>
+            <p>2 சப்பாத்தி + காய்கறி குருமா</p>
+
+            <p>💧 நாள் முழுவதும் தாகத்திற்கு ஏற்ப தண்ணீர் குடிக்கவும்.</p>
+        `;
+    } else {
+        result.innerHTML = `
+            <h3>🌅 காலை உணவு</h3>
+            <p>2 இட்லி + சாம்பார் + வேகவைத்த முட்டை</p>
+
+            <h3>☀️ மதிய உணவு</h3>
+            <p>சாதம் + மீன் குழம்பு + காய்கறிகள்</p>
+
+            <h3>🌙 இரவு உணவு</h3>
+            <p>சப்பாத்தி + சிக்கன் குழம்பு + காய்கறிகள்</p>
+
+            <p>💧 நாள் முழுவதும் தாகத்திற்கு ஏற்ப தண்ணீர் குடிக்கவும்.</p>
+        `;
+    }
+}
+</script>
+
+<div class="card">
+    <h2>💧 Water Tracker</h2>
+    <p>இன்றைய தண்ணீர் குடிக்கும் அளவைக் கண்காணிக்கவும்.</p>
+
+    <h3 id="waterAmount">0 ml / 2000 ml</h3>
+
+    <progress id="waterProgress" value="0" max="2000"
+        style="width: 100%; height: 25px;">
+    </progress>
+
+    <p id="waterMessage">இன்று குடித்த தண்ணீரை பதிவு செய்யுங்கள்.</p>
+
+    <button onclick="addWater(250)">+ 250 ml</button>
+    <button onclick="addWater(500)">+ 500 ml</button>
+    <button onclick="resetWater()">Reset</button>
+</div>
+
+<script>
+let totalWater = 0;
+const dailyGoal = 2000;
+
+function addWater(amount) {
+    totalWater += amount;
+    updateWater();
+}
+
+function resetWater() {
+    totalWater = 0;
+    updateWater();
+}
+
+function updateWater() {
+    document.getElementById("waterAmount").textContent =
+        totalWater + " ml / " + dailyGoal + " ml";
+
+    document.getElementById("waterProgress").value =
+        Math.min(totalWater, dailyGoal);
+
+    if (totalWater >= dailyGoal) {
+        document.getElementById("waterMessage").textContent =
+            "இலக்கை அடைந்துவிட்டீர்கள்! உங்கள் தாகத்திற்கு ஏற்ப குடிக்கவும்.";
+    } else {
+        document.getElementById("waterMessage").textContent =
+            "இலக்கை அடைய இன்னும் " +
+            (dailyGoal - totalWater) + " ml உள்ளது.";
+    }
+}
+</script>
+
+<div class="card">
+    <h2>📊 Nutrition Dashboard</h2>
+    <p>உணவில் உள்ள ஊட்டச்சத்துகளைப் பற்றி அறிந்துகொள்ளுங்கள்.</p>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+
+        <div style="background:#e3f5e8; padding:20px; border-radius:12px; flex:1; min-width:120px;">
+            <h3>🔥 Calories</h3>
+            <p>Energy</p>
+            <strong>உணவின் அளவைப் பொறுத்தது</strong>
+        </div>
+
+        <div style="background:#e3efff; padding:20px; border-radius:12px; flex:1; min-width:120px;">
+            <h3>💪 Protein</h3>
+            <p>உடல் வளர்ச்சி</p>
+            <strong>பருப்பு, முட்டை</strong>
+        </div>
+
+        <div style="background:#fff0d9; padding:20px; border-radius:12px; flex:1; min-width:120px;">
+            <h3>🌾 Carbs</h3>
+            <p>ஆற்றல்</p>
+            <strong>அரிசி, இட்லி</strong>
+        </div>
+
+    </div>
+</div>
+
+<div class="card">
+    <h2>🌿 Healthy Food Tips</h2>
+    <p>🥗 தினமும் பலவகையான காய்கறிகள் மற்றும் பழங்களைச் சாப்பிடுங்கள்.</p>
+    <p>🥜 பருப்பு வகைகள் மற்றும் புரதம் உள்ள உணவுகளைச் சேர்த்துக்கொள்ளுங்கள்.</p>
+    <p>🧂 உப்பு மற்றும் அதிக சர்க்கரை உட்கொள்ளலைக் குறைக்கவும்.</p>
+    <p>🚶 உங்கள் உடல்நிலைக்கு ஏற்ற உடற்பயிற்சி செய்யுங்கள்.</p>
+</div>
+
+</body>
+
+</html>
