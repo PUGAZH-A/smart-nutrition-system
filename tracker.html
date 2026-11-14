@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Nutrition - Meal Planner</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+.tracker-hero {
+    background: linear-gradient(135deg,#dff3df,#f7fff4);
+    padding: 35px;
+    border-radius: 22px;
+    margin-bottom: 25px;
+}
+
+.tracker-hero h1 {
+    color: #145b39;
+}
+
+.tracker-form {
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    margin-bottom: 35px;
+    box-shadow: 0 5px 20px #174b2512;
+}
+
+.tracker-form input,
+.tracker-form select,
+.tracker-form textarea {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.meal-history-card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px #174b2512;
+}
+
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.day-card {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    border: 1px solid #e1eee2;
+    box-shadow: 0 5px 20px #174b2512;
+}
+
+.day-card h3 {
+    color: #176b45;
+    border-bottom: 2px solid #e5f2e5;
+    padding-bottom: 12px;
+}
+
+.planner-field {
+    margin: 14px 0;
+}
+
+.planner-field label {
+    display: block;
+    font-weight: 600;
+    color: #35634a;
+    margin-bottom: 6px;
+}
+
+.planner-field input {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #d5e5d6;
+    border-radius: 9px;
+    box-sizing: border-box;
+}
+
+.planner-field input:disabled {
+    background: #f1f5f1;
+    color: #555;
+}
+
+.planner-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.planner-buttons button {
+    flex: 1;
+    min-width: 75px;
+    padding: 10px;
+}
+
+.edit-btn {
+    background: #dcefe0;
+    color: #145b39;
+}
+
+.delete-btn {
+    background: #ffe5e5;
+    color: #b32626;
+}
+
+.save-btn {
+    background: #176b45;
+}
+
+.section-heading {
+    color: #145b39;
+    margin-top: 35px;
+}
+
+.status-text {
+    color: #176b45;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+@media(max-width:500px) {
+    .tracker-hero { padding: 22px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>🥗 Smart Nutrition</h2>
+    <nav>
+        <a href="index.html">Dashboard</a>
+        <a href="food.html">Foods</a>
+        <a href="analytics.html">Analytics</a>
+    </nav>
+</header>
+
+<section class="page">
+
+    <div class="tracker-hero">
+        <h1>📊 Daily Food Tracker</h1>
+        <p>Track your daily meals and organize your weekly meal schedule.</p>
+    </div>
+
+    <!-- DAILY FOOD TRACKER -->
+    <h2 class="section-heading">🍽️ Add Today's Meal</h2>
+
+    <div class="tracker-form">
+        <form id="mealForm">
+
+            <label>Date</label>
+            <input type="date" id="mealDate" required>
+
+            <label>Meal Type</label>
+            <select id="mealType" required>
+                <option value="">Select Meal</option>
+                <option>Breakfast</option>
+                <option>Lunch</option>
+                <option>Evening Snacks</option>
+                <option>Dinner</option>
+            </select>
+
+            <label>Food Name</label>
+            <input type="text" id="mealName"
+            placeholder="Enter Food Name" required>
+
+            <label>Notes</label>
+            <textarea id="mealNotes"
+            placeholder="Food details or notes"></textarea>
+
+            <button type="submit">➕ Add Meal</button>
+        </form>
+    </div>
+
+    <h2 class="section-heading">📋 My Meal History</h2>
+    <div id="mealHistory" class="cards"></div>
+
+    <!-- WEEKLY MEAL PLANNER -->
+    <h2 class="section-heading">📅 Weekly Meal Planner</h2>
+
+    <p>Plan your meals from Monday to Sunday. Select Edit to change a day's plan and Save to store it.</p>
+
+    <div class="week-grid" id="weeklyPlanner"></div>
+
+</section>
+
+<footer>
+    <p>© 2026 Smart Nutrition System | Student Project</p>
+</footer>
+
+<script>
+
+// ==================================
+// DAILY FOOD TRACKER
+// ==================================
+
+const mealForm = document.getElementById("mealForm");
+
+function getMeals() {
+    return JSON.parse(localStorage.getItem("mealRecords")) || [];
+}
+
+function displayMeals() {
+    const meals = getMeals();
+    const history = document.getElementById("mealHistory");
+
+    history.replaceChildren();
+
+    if (meals.length === 0) {
+        history.innerHTML = "<p>No meals added yet.</p>";
+        return;
+    }
+
+    meals.forEach((meal, index) => {
+        const card = document.createElement("div");
+        card.className = "meal-history-card";
+
+        const title = document.createElement("h3");
+        title.textContent = meal.name;
+
+        const type = document.createElement("p");
+        type.textContent = "Meal: " + meal.type;
+
+        const date = document.createElement("p");
+        date.textContent = "Date: " + meal.date;
+
+        const notes = document.createElement("p");
+        notes.textContent = "Notes: " + (meal.notes || "No notes");
+
+        const remove = document.createElement("button");
+        remove.textContent = "Delete";
+        remove.className = "delete-btn";
+        remove.addEventListener("click", () => deleteMeal(index));
+
+        card.append(title, type, date, notes, remove);
+        history.appendChild(card);
+    });
+}
+
+mealForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const meals = getMeals();
+
+    meals.push({
+        date: document.getElementById("mealDate").value,
+        type: document.getElementById("mealType").value,
+        name: document.getElementById("mealName").value,
+        notes: document.getElementById("mealNotes").value
+    });
+
+    localStorage.setItem("mealRecords", JSON.stringify(meals));
+
+    mealForm.reset();
+    displayMeals();
+
+    alert("Meal Added Successfully!");
+});
+
+function deleteMeal(index) {
+    const meals = getMeals();
+
+    meals.splice(index, 1);
+
+    localStorage.setItem("mealRecords", JSON.stringify(meals));
+    displayMeals();
+}
+
+
+// ==================================
+// WEEKLY MEAL PLANNER
+// ==================================
+
+const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+];
+
+const mealTypes = [
+    "Breakfast",
+    "Lunch",
+    "Evening Snacks",
+    "Dinner"
+];
+
+const defaultPlan = {
+    Monday: {
+        Breakfast: "Idli and Sambar",
+        Lunch: "Rice and Vegetables",
+        "Evening Snacks": "Sundal",
+        Dinner: "Chapati and Curry"
+    },
+    Tuesday: {
+        Breakfast: "Dosa",
+        Lunch: "Vegetable Rice",
+        "Evening Snacks": "Seasonal Fruits",
+        Dinner: "Idiyappam"
+    },
+    Wednesday: {
+        Breakfast: "Pongal",
+        Lunch: "Rice and Dal",
+        "Evening Snacks": "Nuts",
+        Dinner: "Chapati"
+    },
+    Thursday: {
+        Breakfast: "Upma",
+        Lunch: "Curd Rice and Vegetables",
+        "Evening Snacks": "Sundal",
+        Dinner: "Dosa"
+    },
+    Friday: {
+        Breakfast: "Idli",
+        Lunch: "Sambar Rice",
+        "Evening Snacks": "Fruits",
+        Dinner: "Vegetable Chapati"
+    },
+    Saturday: {
+        Breakfast: "Poori and Curry",
+        Lunch: "Rice and Vegetables",
+        "Evening Snacks": "Boiled Corn",
+        Dinner: "Pongal"
+    },
+    Sunday: {
+        Breakfast: "Dosa and Sambar",
+        Lunch: "Variety Rice",
+        "Evening Snacks": "Fruit Salad",
+        Dinner: "Idli and Sambar"
+    }
+};
+
+function getWeeklyPlan() {
+    const saved = localStorage.getItem("weeklyMealPlan");
+
+    if (saved) {
+        return JSON.parse(saved);
+    }
+
+    return JSON.parse(JSON.stringify(defaultPlan));
+}
+
+let weeklyPlan = getWeeklyPlan();
+
+// Food options from Food Database and Admin Panel
+function getFoodOptions() {
+    const localFoodNames = [
+        "Idli and Sambar",
+        "Ragi Koozh",
+        "Vegetable Pongal",
+        "Sundal",
+        "Fish Curry",
+        "Egg Curry"
+    ];
+
+    const adminFoods =
+        JSON.parse(localStorage.getItem("foods")) || [];
+
+    const adminFoodNames = adminFoods.map(food => food.name);
+
+    const defaultFoodNames = [];
+
+    days.forEach(day => {
+        mealTypes.forEach(type => {
+            const name = defaultPlan[day][type];
+            if (name) defaultFoodNames.push(name);
+        });
+    });
+
+    return [...new Set([
+        ...localFoodNames,
+        ...adminFoodNames,
+        ...defaultFoodNames
+    ])].sort();
+}
+
+
+function displayWeeklyPlan() {
+    const planner = document.getElementById("weeklyPlanner");
+
+    planner.replaceChildren();
+
+    days.forEach(day => {
+        const card = document.createElement("div");
+        card.className = "day-card";
+
+        const heading = document.createElement("h3");
+        heading.textContent = "📅 " + day;
+
+        card.appendChild(heading);
+
+        mealTypes.forEach(type => {
+            const field = document.createElement("div");
+            field.className = "planner-field";
+
+            const label = document.createElement("label");
+            label.textContent = type;
+
+const input = document.createElement("select");
+
+input.id = day + "-" + type.replaceAll(" ", "");
+input.disabled = true;
+
+const placeholder = document.createElement("option");
+placeholder.value = "";
+placeholder.textContent = "Select Food";
+input.appendChild(placeholder);
+
+const foodOptions = getFoodOptions();
+
+foodOptions.forEach(foodName => {
+    const option = document.createElement("option");
+    option.value = foodName;
+    option.textContent = foodName;
+    input.appendChild(option);
+});
+
+input.value = weeklyPlan[day][type] || "";
+
+            
+
+            field.append(label, input);
+            card.appendChild(field);
+        });
+
+        const buttons = document.createElement("div");
+        buttons.className = "planner-buttons";
+
+        const edit = document.createElement("button");
+        edit.textContent = "✏️ Edit";
+        edit.className = "edit-btn";
+        edit.addEventListener("click", () => editDay(day));
+
+        const save = document.createElement("button");
+        save.textContent = "💾 Save";
+        save.className = "save-btn";
+        save.style.display = "none";
+        save.addEventListener("click", () => saveDay(day));
+
+        const remove = document.createElement("button");
+        remove.textContent = "🗑 Delete";
+        remove.className = "delete-btn";
+        remove.addEventListener("click", () => deleteDay(day));
+
+        buttons.append(edit, save, remove);
+        card.appendChild(buttons);
+
+        const status = document.createElement("p");
+        status.className = "status-text";
+        status.id = "status-" + day;
+        status.textContent = "Saved meal plan";
+        card.appendChild(status);
+
+        planner.appendChild(card);
+    });
+}
+
+function editDay(day) {
+    mealTypes.forEach(type => {
+        const input = document.getElementById(
+            day + "-" + type.replaceAll(" ", "")
+        );
+
+        input.disabled = false;
+    });
+
+    const card = document.getElementById("status-" + day)
+        .parentElement;
+
+    card.querySelector(".save-btn").style.display = "inline-block";
+    card.querySelector(".edit-btn").style.display = "none";
+
+    document.getElementById("status-" + day).textContent =
+        "Editing " + day + "'s meal plan";
+}
+
+function saveDay(day) {
+    mealTypes.forEach(type => {
+        const input = document.getElementById(
+            day + "-" + type.replaceAll(" ", "")
+        );
+
+        weeklyPlan[day][type] = input.value.trim();
+        input.disabled = true;
+    });
+
+    localStorage.setItem("weeklyMealPlan", JSON.stringify(weeklyPlan));
+
+    const card = document.getElementById("status-" + day)
+        .parentElement;
+
+    card.querySelector(".save-btn").style.display = "none";
+    card.querySelector(".edit-btn").style.display = "inline-block";
+
+    document.getElementById("status-" + day).textContent =
+        "✓ " + day + "'s plan saved successfully";
+
+    alert(day + " Meal Plan Saved!");
+}
+
+function deleteDay(day) {
+    const confirmDelete = confirm(
+        "Delete " + day + "'s meal plan?"
+    );
+
+    if (!confirmDelete) return;
+
+    weeklyPlan[day] = {
+        Breakfast: "",
+        Lunch: "",
+        "Evening Snacks": "",
+        Dinner: ""
+    };
+
+    localStorage.setItem("weeklyMealPlan", JSON.stringify(weeklyPlan));
+
+    displayWeeklyPlan();
+
+    alert(day + "'s meal plan deleted!");
+}
+
+// Initial display
+displayMeals();
+displayWeeklyPlan();
+
+// Set today's date automatically
+document.getElementById("mealDate").value =
+    new Date().toISOString().split("T")[0];
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Nutrition - Tamil Nadu Food Database</title>
+<style>
+:root {
+  --green:#176b45; --dark:#10452f; --light:#edf7ee; --text:#24352b;
+  --muted:#64756a; --white:#fff; --shadow:0 8px 24px rgba(20,70,40,.10);
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; font-family:Arial, sans-serif; color:var(--text);
+  background:linear-gradient(135deg,#eff8ee,#f8fbf4); min-height:100vh;
+}
+header {
+  background:var(--dark); color:white; padding:18px 6%;
+  display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+}
+header h2 { margin:0; font-size:22px; }
+nav { display:flex; gap:18px; flex-wrap:wrap; }
+nav a { color:white; text-decoration:none; font-weight:600; }
+nav a:hover { text-decoration:underline; }
+main { width:min(1200px,92%); margin:30px auto 60px; }
+.hero {
+  padding:38px 25px; border-radius:24px; text-align:center;
+  background:linear-gradient(135deg,#d9f0dc,#f9fff4); box-shadow:var(--shadow);
+}
+.hero h1 { color:var(--dark); margin:0 0 10px; font-size:clamp(27px,4vw,40px); }
+.hero p { color:#486653; margin:8px 0; }
+.count { font-weight:700; color:var(--green); }
+.controls {
+  display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin:26px 0;
+}
+.controls input,.controls select {
+  width:min(330px,100%); padding:13px 15px; border:1px solid #cbdccc;
+  border-radius:12px; background:white; color:var(--text); font-size:15px;
+}
+.section-title { margin:28px 0 16px; color:var(--dark); }
+.food-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:20px;
+}
+.food-card {
+  background:white; border:1px solid #e2ece2; border-radius:18px;
+  overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column;
+  transition:transform .2s ease;
+}
+.food-card:hover { transform:translateY(-4px); }
+.food-photo {
+  height:165px; background:#e6f3e6; display:grid; place-items:center;
+  position:relative; overflow:hidden;
+}
+.food-photo .fallback { font-size:56px; }
+.food-photo img {
+  width:100%; height:100%; object-fit:cover; position:absolute; inset:0;
+}
+.food-info { padding:17px; display:flex; flex-direction:column; flex:1; }
+.food-info h3 { color:var(--green); margin:0 0 8px; }
+.food-info p { color:var(--muted); line-height:1.5; margin:0 0 12px; }
+.tag {
+  display:inline-block; width:max-content; max-width:100%; border-radius:20px;
+  padding:5px 10px; background:var(--light); color:var(--green);
+  font-size:12px; font-weight:700; margin-bottom:12px;
+}
+.details-btn {
+  margin-top:auto; border:0; border-radius:10px; padding:11px 14px;
+  color:white; background:var(--green); font-weight:700; cursor:pointer;
+}
+.details-btn:hover { background:var(--dark); }
+#noFoods { display:none; text-align:center; padding:28px; color:var(--muted); }
+footer { text-align:center; padding:22px; color:#63756a; }
+.modal {
+  display:none; position:fixed; inset:0; z-index:10; overflow:auto;
+  background:rgba(0,0,0,.62); padding:25px 12px;
+}
+.modal-content {
+  background:white; width:min(620px,100%); margin:25px auto; padding:25px;
+  border-radius:20px; position:relative;
+}
+.close-btn {
+  position:absolute; right:15px; top:12px; border:0; border-radius:9px;
+  padding:6px 12px; font-size:23px; cursor:pointer; background:#eaf5eb; color:var(--dark);
+}
+.modal-content h2 { color:var(--green); padding-right:35px; }
+.nutrition-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:16px; }
+.nutrition-item { background:var(--light); border-radius:12px; padding:13px; color:var(--dark); }
+.nutrition-item strong { display:block; font-size:20px; margin-bottom:4px; }
+@media(max-width:520px) {
+  header { justify-content:center; text-align:center; }
+  nav { justify-content:center; }
+  .nutrition-grid { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h2>🥗 Smart Nutrition</h2>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="profile.html">Profile</a>
+    <a href="tracker.html">Tracker</a>
+    <a href="analytics.html">Analytics</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Discover Tamil Nadu Foods 🍲</h1>
+    <p>Explore traditional meals, snacks and regional food choices.</p>
+    <p id="localityMessage">Tamil Nadu Food Recommendations</p>
+    <p class="count"><span id="foodCount">100</span> foods in the database</p>
+  </section>
+
+  <div class="controls">
+    <input id="searchFood" type="search" placeholder="🔍 Search food name...">
+    <select id="foodType">
+      <option value="All">All Food Types</option>
+      <option value="Vegetarian">Vegetarian</option>
+      <option value="Non-Vegetarian">Non-Vegetarian</option>
+    </select>
+    <select id="foodCategory">
+      <option value="All">All Categories</option>
+      <option value="Breakfast">Breakfast</option>
+      <option value="Lunch">Lunch</option>
+      <option value="Traditional">Traditional</option>
+      <option value="Vegetarian">Vegetarian Dishes</option>
+      <option value="Snacks">Snacks</option>
+      <option value="Non-Veg">Non-Vegetarian Dishes</option>
+      <option value="Sweets">Sweets</option>
+    </select>
+  </div>
+
+  <h2 class="section-title">📍 Local Food Suggestions</h2>
+  <div class="food-grid" id="localFoodList"></div>
+  <p id="noFoods">No matching foods found. Try another search or filter.</p>
+</main>
+
+<div class="modal" id="foodModal">
+  <div class="modal-content">
+    <button class="close-btn" id="closeModal" aria-label="Close">×</button>
+    <h2 id="detailName">Food Details</h2>
+    <p id="detailDescription"></p>
+    <h3>Approximate Nutrition Information</h3>
+    <p>Estimated values per serving. Actual values vary by recipe and portion size.</p>
+    <div class="nutrition-grid">
+      <div class="nutrition-item"><strong id="detailCalories">-</strong>Calories</div>
+      <div class="nutrition-item"><strong id="detailProtein">-</strong>Protein (g)</div>
+      <div class="nutrition-item"><strong id="detailCarbs">-</strong>Carbohydrates (g)</div>
+      <div class="nutrition-item"><strong id="detailFat">-</strong>Fat (g)</div>
+      <div class="nutrition-item"><strong id="detailFibre">-</strong>Fibre (g)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const foodRows = [
+["Idli","Breakfast","Soft steamed rice cakes",120,4,25,1,2,"Vegetarian"],
+["Dosa","Breakfast","Crispy fermented rice crepe",168,4,28,4,2,"Vegetarian"],
+["Pongal","Breakfast","Rice and moong dal pongal",210,7,34,5,3,"Vegetarian"],
+["Rava Upma","Breakfast","Semolina breakfast dish",180,5,30,5,3,"Vegetarian"],
+["Ven Pongal","Breakfast","Traditional pepper pongal",220,7,35,6,3,"Vegetarian"],
+["Ragi Dosa","Breakfast","Finger millet dosa",150,5,25,3,4,"Vegetarian"],
+["Adai","Breakfast","Mixed lentil pancake",190,9,27,5,5,"Vegetarian"],
+["Paniyaram","Breakfast","Small fermented rice dumplings",160,4,27,4,2,"Vegetarian"],
+["Appam","Breakfast","Soft rice pancake",140,3,29,2,1,"Vegetarian"],
+["Idiyappam","Breakfast","Steamed rice string hoppers",130,3,28,1,1,"Vegetarian"],
+["Kuzhi Paniyaram","Breakfast","Traditional paniyaram",170,4,28,5,2,"Vegetarian"],
+["Kambu Dosa","Breakfast","Pearl millet dosa",155,5,26,3,4,"Vegetarian"],
+["Thinai Pongal","Breakfast","Foxtail millet pongal",205,7,32,5,4,"Vegetarian"],
+["Samai Upma","Breakfast","Little millet upma",185,5,31,4,4,"Vegetarian"],
+["Ragi Kali","Breakfast","Traditional finger millet preparation",180,5,37,1,5,"Vegetarian"],
+["Sambar Rice","Lunch","Rice cooked with lentils and vegetables",250,8,43,5,5,"Vegetarian"],
+["Curd Rice","Lunch","Rice mixed with curd",220,6,38,5,1,"Vegetarian"],
+["Lemon Rice","Lunch","Rice flavoured with lemon",230,5,40,6,2,"Vegetarian"],
+["Tamarind Rice","Lunch","Traditional puliyodarai",240,5,42,6,3,"Vegetarian"],
+["Coconut Rice","Lunch","Rice with grated coconut",260,5,39,9,3,"Vegetarian"],
+["Tomato Rice","Lunch","Spiced tomato rice",235,5,41,6,3,"Vegetarian"],
+["Vegetable Biryani","Lunch","Rice with mixed vegetables",290,7,48,8,4,"Vegetarian"],
+["Mushroom Biryani","Lunch","Biryani with mushrooms",280,8,45,7,3,"Vegetarian"],
+["Kothamalli Rice","Lunch","Coriander flavoured rice",225,5,39,6,3,"Vegetarian"],
+["Mint Rice","Lunch","Fresh mint rice",220,5,38,6,3,"Vegetarian"],
+["Beetroot Rice","Lunch","Rice with beetroot",230,5,40,5,4,"Vegetarian"],
+["Carrot Rice","Lunch","Rice with grated carrots",225,5,39,5,3,"Vegetarian"],
+["Keerai Sadam","Lunch","Rice mixed with greens",215,6,36,5,5,"Vegetarian"],
+["Paruppu Sadam","Lunch","Rice with lentils",240,9,40,5,5,"Vegetarian"],
+["Ellu Sadam","Lunch","Sesame flavoured rice",250,7,38,8,4,"Vegetarian"],
+["Ragi Koozh","Traditional","Traditional fermented finger millet porridge",160,5,32,2,5,"Vegetarian"],
+["Kambu Koozh","Traditional","Pearl millet porridge",150,5,30,2,4,"Vegetarian"],
+["Neeragaram","Traditional","Traditional soaked rice preparation",110,3,23,1,1,"Vegetarian"],
+["Kezhvaragu Kali","Traditional","Finger millet ball",180,5,37,1,5,"Vegetarian"],
+["Kambu Sadam","Traditional","Cooked pearl millet",170,5,34,2,5,"Vegetarian"],
+["Thinai Sadam","Traditional","Cooked foxtail millet",175,6,34,2,4,"Vegetarian"],
+["Kuthiraivali Sadam","Traditional","Barnyard millet rice",165,5,32,2,4,"Vegetarian"],
+["Samai Sadam","Traditional","Little millet rice",170,5,33,2,4,"Vegetarian"],
+["Paniyaram with Chutney","Traditional","Paniyaram served with chutney",200,5,32,6,3,"Vegetarian"],
+["Kara Kuzhambu","Traditional","Spicy tamarind-based curry",130,3,15,6,3,"Vegetarian"],
+["Avial","Vegetarian","Mixed vegetables with coconut",180,5,18,9,5,"Vegetarian"],
+["Poriyal","Vegetarian","South Indian vegetable stir fry",110,3,12,6,4,"Vegetarian"],
+["Kootu","Vegetarian","Vegetable and lentil curry",160,7,22,5,5,"Vegetarian"],
+["Keerai Masiyal","Vegetarian","Mashed greens preparation",100,5,10,4,4,"Vegetarian"],
+["Beans Poriyal","Vegetarian","Beans cooked with spices",105,3,12,5,4,"Vegetarian"],
+["Cabbage Poriyal","Vegetarian","Cabbage coconut stir fry",95,2,10,5,3,"Vegetarian"],
+["Carrot Poriyal","Vegetarian","Carrot coconut stir fry",100,2,12,5,3,"Vegetarian"],
+["Vendakkai Poriyal","Vegetarian","Okra stir fry",115,3,13,6,4,"Vegetarian"],
+["Kathirikai Gothsu","Vegetarian","Brinjal curry",125,3,14,6,4,"Vegetarian"],
+["Poondu Kuzhambu","Vegetarian","Garlic tamarind curry",140,3,16,7,3,"Vegetarian"],
+["Murungakkai Sambar","Vegetarian","Drumstick lentil curry",150,7,21,4,5,"Vegetarian"],
+["Paruppu Rasam","Vegetarian","Lentil flavoured rasam",90,5,12,2,2,"Vegetarian"],
+["Milagu Rasam","Vegetarian","Pepper flavoured rasam",65,2,9,2,1,"Vegetarian"],
+["Tomato Rasam","Vegetarian","Traditional tomato rasam",70,2,10,2,1,"Vegetarian"],
+["Sundal","Vegetarian","Boiled legumes with coconut",160,8,22,4,6,"Vegetarian"],
+["Medu Vada","Snacks","Crispy urad dal fritter",180,6,20,9,3,"Vegetarian"],
+["Masala Vada","Snacks","Spiced lentil fritter",190,7,22,9,4,"Vegetarian"],
+["Bajji","Snacks","Vegetable gram flour fritter",170,4,20,9,2,"Vegetarian"],
+["Onion Pakoda","Snacks","Crispy onion fritters",200,5,23,10,3,"Vegetarian"],
+["Samosa","Snacks","Spiced vegetable pastry",260,5,30,13,3,"Vegetarian"],
+["Murukku","Snacks","Crunchy rice flour snack",190,3,24,9,2,"Vegetarian"],
+["Thattai","Snacks","Traditional crispy rice snack",180,3,23,8,2,"Vegetarian"],
+["Seedai","Snacks","Small crunchy rice balls",170,3,22,8,1,"Vegetarian"],
+["Kara Sev","Snacks","Spicy gram flour snack",200,5,22,11,2,"Vegetarian"],
+["Pori Urundai","Snacks","Puffed rice and jaggery balls",130,2,29,1,1,"Vegetarian"],
+["Kadalai Urundai","Snacks","Peanut and jaggery balls",160,5,18,8,2,"Vegetarian"],
+["Sundal with Green Gram","Snacks","Green gram sundal",145,9,20,3,6,"Vegetarian"],
+["Boiled Groundnuts","Snacks","Boiled peanuts",160,7,14,9,4,"Vegetarian"],
+["Sweet Kozhukattai","Snacks","Rice dumpling with sweet filling",150,3,30,2,2,"Vegetarian"],
+["Kara Kozhukattai","Snacks","Savoury steamed rice dumpling",140,4,25,3,2,"Vegetarian"],
+["Chettinad Chicken Curry","Non-Veg","Spicy Chettinad chicken curry",260,25,8,14,2,"Non-Vegetarian"],
+["Chicken Kuzhambu","Non-Veg","Traditional chicken gravy",240,24,7,13,2,"Non-Vegetarian"],
+["Chicken 65","Non-Veg","Spicy fried chicken pieces",290,23,10,17,1,"Non-Vegetarian"],
+["Fish Curry","Non-Veg","Fish cooked in tamarind gravy",210,22,8,10,2,"Non-Vegetarian"],
+["Meen Varuval","Non-Veg","Spiced fish fry",250,24,5,15,1,"Non-Vegetarian"],
+["Nethili Fry","Non-Veg","Anchovy fish fry",230,21,7,13,1,"Non-Vegetarian"],
+["Egg Curry","Non-Veg","Eggs in spicy gravy",190,12,8,12,2,"Non-Vegetarian"],
+["Muttai Poriyal","Non-Veg","South Indian egg stir fry",170,12,4,11,1,"Non-Vegetarian"],
+["Mutton Kuzhambu","Non-Veg","Traditional mutton gravy",300,24,7,20,2,"Non-Vegetarian"],
+["Kari Dosai","Non-Veg","Madurai-style meat dosa",320,18,30,14,2,"Non-Vegetarian"],
+["Sakkarai Pongal","Sweets","Sweet rice and jaggery pongal",250,5,45,6,2,"Vegetarian"],
+["Paal Payasam","Sweets","Milk-based rice pudding",220,6,35,7,1,"Vegetarian"],
+["Akkaravadisal","Sweets","Traditional sweet milk rice",280,6,43,9,1,"Vegetarian"],
+["Mysore Pak","Sweets","Gram flour and ghee sweet",300,5,30,19,1,"Vegetarian"],
+["Adhirasam","Sweets","Traditional jaggery rice sweet",260,3,42,9,1,"Vegetarian"],
+["Paal Kozhukattai","Sweets","Rice dumplings cooked in milk",210,5,36,5,1,"Vegetarian"],
+["Kesari","Sweets","Sweet semolina preparation",230,4,39,7,1,"Vegetarian"],
+["Kalkandu Sadam","Sweets","Sweet rice with sugar candy",240,5,42,6,1,"Vegetarian"],
+["Pori Vilayadal","Sweets","Puffed rice sweet mixture",150,2,32,2,1,"Vegetarian"],
+["Kadalai Mittai","Sweets","Peanut jaggery brittle",170,6,20,8,2,"Vegetarian"],
+["Kanchipuram Idli","Breakfast","Steamed idli seasoned with pepper, cumin and ginger",190,6,30,5,3,"Vegetarian"],
+["Wheat Dosa","Breakfast","Thin dosa prepared with wheat flour",155,5,27,3,3,"Vegetarian"],
+["Ragi Puttu","Breakfast","Steamed finger millet flour with coconut",210,5,38,4,5,"Vegetarian"],
+["Kootanchoru","Lunch","Traditional one-pot rice with lentils and vegetables",275,9,46,6,6,"Vegetarian"],
+["Vatha Kuzhambu","Lunch","Tangy tamarind gravy with sun-dried vegetables",145,3,18,7,3,"Vegetarian"],
+["Thengai Paal Sadam","Lunch","Rice prepared with coconut milk and mild spices",285,5,42,10,2,"Vegetarian"],
+["Kollu Rasam","Traditional","Horse gram rasam with pepper and spices",95,6,13,2,3,"Vegetarian"],
+["Kara Paniyaram","Snacks","Savoury paniyaram with onion and green chilli",175,5,27,5,2,"Vegetarian"],
+["Prawn Thokku","Non-Veg","Prawns cooked in a thick onion and tomato masala",230,22,8,12,1,"Non-Vegetarian"],
+["Nattu Kozhi Kuzhambu","Non-Veg","Country chicken curry with traditional spices",270,26,7,15,2,"Non-Vegetarian"]
+];
+
+const localFoods = foodRows.map(([name,category,description,calories,protein,carbs,fat,fibre,type]) => ({name,category,description,calories,protein,carbs,fat,fibre,type,locality:"Tamil Nadu"}));
+
+const foodList = document.getElementById("localFoodList");
+const searchInput = document.getElementById("searchFood");
+const typeSelect = document.getElementById("foodType");
+const categorySelect = document.getElementById("foodCategory");
+const noFoods = document.getElementById("noFoods");
+
+function createFoodCard(food) {
+  const card = document.createElement("article");
+  card.className = "food-card";
+
+  const photo = document.createElement("div");
+  photo.className = "food-photo";
+
+  const fallback = document.createElement("span");
+  fallback.className = "fallback";
+  fallback.textContent = "🍽️";
+  photo.appendChild(fallback);
+
+  const img = document.createElement("img");
+  img.alt = food.name;
+  img.loading = "lazy";
+  const foodImages = [
+  "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=640",
+  "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=640",
+  "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=640",
+  "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=640",
+  "https://images.unsplash.com/photo-1547592180-85f173990554?w=640",
+  "https://images.unsplash.com/photo-1567337710282-00832b415979?w=640"
+];
+
+const imageIndex = foodRows.findIndex(item => item[0] === food.name) % foodImages.length;
+
+img.src = foodImages[imageIndex];
+img.onerror = function () {
+    this.remove();
+};
+  img.onerror = function () { this.remove(); };
+  photo.appendChild(img);
+
+  const info = document.createElement("div");
+  info.className = "food-info";
+
+  const title = document.createElement("h3");
+  title.textContent = food.name;
+
+  const description = document.createElement("p");
+  description.textContent = food.description;
+
+  const tag = document.createElement("span");
+  tag.className = "tag";
+  tag.textContent = food.category + " • " + food.type;
+
+  const button = document.createElement("button");
+  button.className = "details-btn";
+  button.type = "button";
+  button.textContent = "View Food Details →";
+  button.addEventListener("click", () => showDetails(food));
+
+  info.append(title, description, tag, button);
+  card.append(photo, info);
+  return card;
+}
+
+function displayFoods(list) {
+  foodList.replaceChildren();
+  list.forEach(food => foodList.appendChild(createFoodCard(food)));
+  noFoods.style.display = list.length ? "none" : "block";
+  document.getElementById("foodCount").textContent = list.length;
+}
+
+function filterFoods() {
+  const search = searchInput.value.trim().toLowerCase();
+  const type = typeSelect.value;
+  const category = categorySelect.value;
+
+  const filtered = localFoods.filter(food =>
+    food.name.toLowerCase().includes(search) &&
+    (type === "All" || food.type === type) &&
+    (category === "All" || food.category === category)
+  );
+
+  displayFoods(filtered);
+}
+
+function showDetails(food) {
+  document.getElementById("detailName").textContent = food.name;
+  document.getElementById("detailDescription").textContent = food.description;
+  document.getElementById("detailCalories").textContent = food.calories;
+  document.getElementById("detailProtein").textContent = food.protein;
+  document.getElementById("detailCarbs").textContent = food.carbs;
+  document.getElementById("detailFat").textContent = food.fat;
+  document.getElementById("detailFibre").textContent = food.fibre;
+  document.getElementById("foodModal").style.display = "block";
+}
+
+function closeDetails() {
+  document.getElementById("foodModal").style.display = "none";
+}
+
+searchInput.addEventListener("input", filterFoods);
+typeSelect.addEventListener("change", filterFoods);
+categorySelect.addEventListener("change", filterFoods);
+document.getElementById("closeModal").addEventListener("click", closeDetails);
+
+document.getElementById("foodModal").addEventListener("click", event => {
+  if (event.target.id === "foodModal") closeDetails();
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeDetails();
+});
+
+document.getElementById("foodCount").textContent = localFoods.length;
+displayFoods(localFoods);
+console.log("Tamil Nadu food database loaded:", localFoods.length);
+</script>
+
+<footer>Smart Nutrition System • Educational nutrition estimates only</footer>
+</body>
+</html>
