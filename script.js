@@ -23,6 +23,8 @@ document.getElementById("registerForm").addEventListener("submit", function(e) {
         email: document.getElementById("email").value,
         password: document.getElementById("password").value,
         age: document.getElementById("age").value,
+        height: document.getElementById("height").value,
+        weight: document.getElementById("weight").value,
         locality: document.getElementById("locality").value,
         food: document.getElementById("food").value
     };
